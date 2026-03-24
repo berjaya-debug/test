@@ -1,0 +1,9 @@
+{
+  "name": "Absensi",
+  "short_name": "Absensi",
+  "start_url": "/redirect.html",
+  "display": "standalone",
+  "background_color": "#f8f5ff",
+  "theme_color": "#4b0082",
+  "icons": []
+}

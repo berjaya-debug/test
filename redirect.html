@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirect</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4b0082">
+</head>
+<body>
+<h2>Loading...</h2>
+
+<script>
+const APP_URL = "app.html";
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  const btn = document.createElement("button");
+  btn.innerText = "Install App";
+  document.body.appendChild(btn);
+
+  btn.onclick = async () => {
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+  };
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+
+setTimeout(() => {
+  window.location.href = APP_URL;
+}, 1500);
+</script>
+
+</body>
+</html>
