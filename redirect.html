@@ -1,41 +1,68 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Redirect</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4b0082">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Absensi Admin – Berjaya Group</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3a0ca3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  
+  <link rel="icon" type="image/png" href="BERJAYA GROUP LOGO aja.png">
+  <link rel="apple-touch-icon" href="BERJAYA GROUP LOGO aja.png">
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f5ff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; padding: 20px; }
+    .container { background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(58,12,163,0.1); text-align: center; width: 100%; max-width: 400px; }
+    .logo { width: 180px; margin-bottom: 20px; }
+    h2 { color: #3a0ca3; margin-bottom: 25px; font-size: 1.4rem; }
+    .btn { display: block; width: 100%; padding: 18px; margin: 12px 0; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; color: #fff; }
+    .btn-absen { background: linear-gradient(135deg, #7209b7, #3a0ca3); box-shadow: 0 4px 12px rgba(114,9,183,0.3); }
+    .btn-izin { background: linear-gradient(135deg, #f72585, #b5179e); box-shadow: 0 4px 12px rgba(247,37,133,0.3); }
+    .btn:active { transform: scale(0.96); }
+  </style>
 </head>
 <body>
-<h2>Loading...</h2>
+
+<div class="container">
+    <img src="BERJAYA GROUP LOGO aja.png" alt="Logo" class="logo">
+    <h2>Absensi Divisi Admin</h2>
+    <button class="btn btn-absen" onclick="location.href='https://link-absen-anda.com'">💳 Masuk / Pulang</button>
+    <button class="btn btn-izin" onclick="location.href='https://link-izin-anda.com'">📄 Izin / Cuti</button>
+</div>
 
 <script>
-const APP_URL = "app.html";
-let deferredPrompt;
+  // Registrasi Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => console.log('SW OK')).catch(err => console.log('SW Fail', err));
+    });
+  }
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  const btn = document.createElement("button");
-  btn.innerText = "Install App";
-  document.body.appendChild(btn);
-
-  btn.onclick = async () => {
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-  };
-});
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
-
-setTimeout(() => {
-  window.location.href = APP_URL;
-}, 1500);
+  // Logika Install PWA
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    Swal.fire({
+      title: 'Pasang Aplikasi?',
+      text: "Tambahkan Absensi Berjaya Group ke layar utama HP Anda!",
+      imageUrl: 'BERJAYA GROUP LOGO aja.png',
+      imageWidth: 100,
+      showCancelButton: true,
+      confirmButtonText: 'Pasang Sekarang',
+      cancelButtonText: 'Nanti',
+      confirmButtonColor: '#3a0ca3'
+    }).then((result) => {
+      if (result.isConfirmed && deferredPrompt) {
+        deferredPrompt.prompt();
+      }
+    });
+  });
 </script>
-
 </body>
 </html>
