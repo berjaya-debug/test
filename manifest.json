@@ -2,7 +2,7 @@
   "name": "Absensi Divisi Admin – Berjaya Group",
   "short_name": "AbsenAdmin",
   "description": "Aplikasi Absensi Divisi Admin Berjaya Group",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#f8f5ff",
   "theme_color": "#3a0ca3",
