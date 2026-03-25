@@ -1,9 +1,21 @@
 {
-  "name": "Absensi",
-  "short_name": "Absensi",
-  "start_url": "/redirect.html",
+  "name": "Absensi Divisi Admin – Berjaya Group",
+  "short_name": "AbsenAdmin",
+  "description": "Aplikasi Absensi Divisi Admin Berjaya Group",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#f8f5ff",
-  "theme_color": "#4b0082",
-  "icons": []
+  "theme_color": "#3a0ca3",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1033/1033935.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1033/1033935.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
