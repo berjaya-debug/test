@@ -1,19 +1,19 @@
-const CACHE_NAME = "absensi-v1";
+const CACHE_NAME = 'absen-admin-v1';
 const urlsToCache = [
-  "/redirect.html",
-  "/app.html",
-  "/offline.html"
+  '/',
+  '/index.html',
+  'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap',
+  'https://cdn.jsdelivr.net/npm/sweetalert2@11'
 ];
 
-self.addEventListener("install", event => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
-self.addEventListener("fetch", event => {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).catch(() => caches.match("/offline.html"))
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
