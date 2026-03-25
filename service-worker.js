@@ -1,7 +1,7 @@
 const CACHE_NAME = 'absen-admin-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
+  'index.html',
   'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap',
   'https://cdn.jsdelivr.net/npm/sweetalert2@11'
 ];
