@@ -493,17 +493,40 @@
         <span>🏠 PULANG</span>
       </div>
     </div>
-    <div id="areaStoringMendadak" style="display: none; margin-top: 15px; padding: 15px; border: 2px dashed #ff416c; border-radius: 12px; background-color: #fff5f5; text-align: center;">
-      <p style="font-size: 13px; color: #ff416c; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-        🚨 Panggilan Storing Mendadak
-      </p>
-      <button type="button" onclick="klaimStoringMendadak()" 
-              style="width: 100%; padding: 15px; background: linear-gradient(45deg, #ff4b2b, #ff416c); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4); cursor: pointer; transition: 0.3s;">
-        KLAIM BONUS (+30rb)
+    <div id="areaStoringMendadak" style="display: none; margin-top: 15px; padding: 15px; border: 2px dashed #ff416c; border-radius: 12px; background-color: #fff5f5;">
+      <p style="font-size: 13px; color: #ff416c; margin-bottom: 10px; font-weight: bold; text-align: center;">🚨 STORING MENDADAK (PANGGILAN)</p>
+      
+      <button type="button" onclick="absenMendadak('HADIR')" 
+              style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 8px;">
+        START STORING
       </button>
-      <p style="font-size: 10px; color: #666; margin-top: 8px;">*Gunakan tombol ini hanya jika dipanggil setelah jam pulang.</p>
+    
+      <button type="button" onclick="absenMendadak('PULANG')" 
+              style="width: 100%; padding: 12px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: bold;">
+        SELESAI STORING
+      </button>
     </div>
-  </div>
+    
+    <script>
+    function absenMendadak(status) {
+      const nama = document.getElementById('nama').value;
+      const lokasi = document.getElementById('lokasi').value;
+      if (!nama || nama === "Pilih Nama...") return alert("Pilih Nama dulu!");
+    
+      const pesan = status === 'HADIR' ? "Mulai Storing Mendadak?" : "Selesai Storing Mendadak?";
+      
+      if (confirm(pesan)) {
+        showLoading(true);
+        // Kita tetap kirim status HADIR/PULANG tapi TIPENYA khusus
+        google.script.run
+          .withSuccessHandler(function() {
+            showLoading(false);
+            alert("Data Storing " + status + " berhasil dicatat!");
+          })
+          .simpanAbsen(nama, status, "STORING MENDADAK", lokasi);
+      }
+    }
+    </script>
 
   <!-- Storing toggle -->
   <div class="storing-wrap">
