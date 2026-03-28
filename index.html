@@ -843,7 +843,7 @@ function updateTampilanStoring() {
   }
 }
 
-// 2. Fungsi Proses Absen Storing
+// 1. Fungsi Proses Absen Storing
 function prosesStoring(status) {
   const nama = document.getElementById('nama').value;
   const lokasi = document.getElementById('lokasi').value;
@@ -860,38 +860,73 @@ function prosesStoring(status) {
     text: teks,
     icon: 'question',
     showCancelButton: true,
-    confirmButtonText: 'Ya, Proses'
+    confirmButtonText: 'Ya, Proses',
+    cancelButtonText: 'Batal'
   }).then((result) => {
     if (result.isConfirmed) {
       showLoading(true);
       
-      // Matikan tombol agar tidak double click
+      // Matikan semua tombol agar tidak terjadi double input
       kunciSemuaTombol(true);
 
       google.script.run
         .withSuccessHandler(function() {
           showLoading(false);
+          // Kita buka kunci lagi setelah berhasil jika tidak reload
+          kunciSemuaTombol(false); 
           Swal.fire("Berhasil", "Data Storing " + status + " tercatat!", "success");
-          // Anda bisa menambahkan location.reload() jika ingin form reset otomatis
+          
+          // Opsional: aktifkan ini jika ingin form langsung bersih kembali
+          // location.reload(); 
         })
         .withFailureHandler(function(err) {
           showLoading(false);
-          kunciSemuaTombol(false);
-          Swal.fire("Error", err.toString(), "error");
+          kunciSemuaTombol(false); // Buka kunci jika gagal agar bisa coba lagi
+          Swal.fire("Error", "Gagal mengirim data: " + err.toString(), "error");
         })
         .simpanAbsen(nama, status, "STORING MENDADAK", lokasi);
     }
   });
 }
 
-// 3. Fungsi Pengunci (Agar tidak tabrakan)
+// 2. Fungsi Pengunci (ID disesuaikan dengan HTML index 7 Anda)
 function kunciSemuaTombol(status) {
-  const ids = ['btn-hadir', 'btn-pulang', 'btnStartStoring', 'btnStopStoring'];
+  // ID 'hadir' & 'pulang' adalah tombol reguler di file Anda
+  // ID 'btnStartStoring' & 'btnStopStoring' adalah tombol baru
+  const ids = ['hadir', 'pulang', 'btnStartStoring', 'btnStopStoring'];
+  
   ids.forEach(id => {
     const btn = document.getElementById(id);
-    if (btn) btn.disabled = status;
+    if (btn) {
+      btn.disabled = status;
+      // Tambahkan efek visual agar staff tahu tombol sedang mati
+      btn.style.opacity = status ? "0.5" : "1";
+      btn.style.cursor = status ? "not-allowed" : "pointer";
+    }
   });
 }
+
+// 3. Fungsi Cek Waktu (Agar muncul otomatis)
+function updateTampilanStoring() {
+  const sekarang = new Date();
+  const jam = sekarang.getHours();
+  const area = document.getElementById('areaStoringMendadak');
+  
+  if (area) {
+    // Untuk tes SEKARANG, Anda bisa ganti 17 menjadi 0
+    if (jam >= 10) { 
+      area.style.display = 'block';
+    } else {
+      area.style.display = 'none';
+    }
+  }
+}
+
+// 4. Pastikan dipanggil saat halaman siap
+window.onload = function() {
+  updateTampilanStoring();
+  if (typeof initApp === 'function') initApp();
+};
 
   <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_63cbGmBGfHqUL8oq2noSGS6a5kYesobaZnRIPIBn9IOouA/viewform?usp=publish-editor" 
      target="_blank" 
