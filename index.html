@@ -243,47 +243,97 @@
     .storing-icon { font-size: 20px; }
 
     /* ── STORING MENDADAK AREA ───────────────────────────── */
-    #areaStoringMendadak {
-      display: none;
-      border-top: 2px dashed rgba(255,215,0,0.4);
-      margin-top: 20px;
-      padding-top: 20px;
+    <!-- HANYA BAGIAN YANG DIUBAH DARI FILE KAMU -->
+
+    <!-- ================== TAMBAHAN CSS ================== -->
+    <style>
+    .storing-btn-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
-    .storing-mendadak-title {
-      text-align: center;
-      font-weight: 700;
-      color: #ff6b6b;
-      margin-bottom: 12px;
-      font-size: 13px;
-      letter-spacing: 0.5px;
+    </style>
+    
+    <!-- ================== AREA STORING (REPLACE) ================== -->
+    <div id="areaStoringMendadak">
+      <div class="storing-mendadak-title">🚨 STORING MENDADAK</div>
+    
+      <div class="storing-btn-wrap">
+        <button type="button" id="btnStartStoring" class="btn-storing btn-storing-mulai"
+                onclick="prosesStoring('HADIR')">
+          MASUK
+        </button>
+    
+        <button type="button" id="btnStopStoring" class="btn-storing btn-storing-selesai"
+                onclick="prosesStoring('PULANG')">
+          KELUAR
+        </button>
+      </div>
+    </div>
+    
+    <!-- ================== SCRIPT FIX ================== -->
+    <script>
+    function updateTampilanStoring() {
+      var jam  = new Date().getHours();
+      var area = document.getElementById('areaStoringMendadak');
+    
+      if (jam >= 17) {
+        area.style.display = 'block';
+      } else {
+        area.style.display = 'none';
+      }
     }
-    .btn-storing {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 800;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      color: white;
-      margin-bottom: 10px;
-      transition: all 0.25s;
+    
+    /* FIX: pastikan kirim tipe storing mendadak */
+    function prosesStoring(status) {
+      var nama = document.getElementById('namaStaff').value;
+    
+      if (!nama) {
+        Swal.fire({
+          title: "Nama Kosong",
+          text: "Silakan pilih nama kamu terlebih dahulu!",
+          icon: "warning",
+          confirmButtonColor: "#4b0082"
+        });
+        return;
+      }
+    
+      var teks = status === 'HADIR'
+        ? "Mulai tugas Storing Mendadak?"
+        : "Selesai tugas Storing Mendadak?";
+    
+      Swal.fire({
+        title: 'Konfirmasi Storing',
+        text: teks,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Proses',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#4b0082',
+        cancelButtonColor: '#d33'
+      }).then(function(result) {
+        if (result.isConfirmed) {
+    
+          apiPost({
+            action    : "prosesAbsen",
+            lat       : koordinatGPS ? koordinatGPS.lat : 0,
+            lon       : koordinatGPS ? koordinatGPS.lon : 0,
+            namaStaff : nama,
+            imageBase64: base64Foto || '',
+            status    : status,
+            isStoring : true,
+            tipe      : "STORING MENDADAK"
+          }, function(res) {
+            if (res.status === "BERHASIL") {
+              Swal.fire("Berhasil", "Storing berhasil dicatat", "success");
+            } else {
+              Swal.fire("Gagal", JSON.stringify(res), "error");
+            }
+          });
+        }
+      });
     }
-    .btn-storing:last-child { margin-bottom: 0; }
-    .btn-storing:active { transform: scale(0.97); }
-    .btn-storing:disabled { background: #333 !important; cursor: not-allowed; color: #666; }
-    .btn-storing-mulai {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      box-shadow: 0 6px 20px rgba(17,153,142,0.4);
-    }
-    .btn-storing-selesai {
-      background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%);
-      box-shadow: 0 6px 20px rgba(203,45,62,0.4);
-    }
+    </script>
 
     /* ── CAMERA / PREVIEW ────────────────────────────────── */
     .camera-wrap { margin-bottom: 20px; }
@@ -490,15 +540,19 @@
 
     <!-- Area Storing Mendadak — hanya muncul jam 17.00 ke atas -->
     <div id="areaStoringMendadak">
-      <div class="storing-mendadak-title">🚨 KHUSUS PANGGILAN STORING MENDADAK</div>
-      <button type="button" id="btnStartStoring" class="btn-storing btn-storing-mulai"
-              onclick="prosesStoring('HADIR')">
-        MULAI STORING
-      </button>
-      <button type="button" id="btnStopStoring" class="btn-storing btn-storing-selesai"
-              onclick="prosesStoring('PULANG')">
-        SELESAI STORING
-      </button>
+      <div class="storing-mendadak-title">🚨 STORING MENDADAK</div>
+    
+      <div class="storing-btn-wrap">
+        <button id="btnStartStoring" class="btn-storing btn-storing-mulai"
+          onclick="prosesStoring('HADIR')">
+          MASUK
+        </button>
+    
+        <button id="btnStopStoring" class="btn-storing btn-storing-selesai"
+          onclick="prosesStoring('PULANG')">
+          KELUAR
+        </button>
+      </div>
     </div>
   </div>
 
