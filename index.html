@@ -511,18 +511,18 @@
     
     <script>
     function absenMendadak(status) {
-      const nama = document.getElementById('nama').value;
+      const nama = document.getElementById('namaStaff').value;
       const lokasi = document.getElementById('lokasi').value;
       if (!nama || nama === "Pilih Nama...") return alert("Pilih Nama dulu!");
     
       const pesan = status === 'HADIR' ? "Mulai Storing Mendadak?" : "Selesai Storing Mendadak?";
       
       if (confirm(pesan)) {
-        showLoading(true);
+        tampilkanLoading();
         // Kita tetap kirim status HADIR/PULANG tapi TIPENYA khusus
         google.script.run
           .withSuccessHandler(function() {
-            showLoading(false);
+            sembunyikanLoading();
             alert("Data Storing " + status + " berhasil dicatat!");
           })
           .simpanAbsen(nama, status, "STORING MENDADAK", lokasi);
@@ -597,7 +597,7 @@ window.onload = function () {
     handleFile(this);
   });
   ambilGPSBackground();
-  updateTampilanMendadak(); // Tambahkan baris ini
+  updateTampilanStoring(); // Tambahkan baris ini
   initApp();                // Fungsi bawaan Anda
 };
 
@@ -834,9 +834,10 @@ function sembunyikanLoading() {
 function updateTampilanStoring() {
   const jam = new Date().getHours();
   const area = document.getElementById('areaStoringMendadak');
-  
-  // Munculkan jika sudah jam 17.00 ke atas
-  if (jam >= 10) {
+
+  if (!area) return;
+
+  if (jam >= 0) {
     area.style.display = 'block';
   } else {
     area.style.display = 'none';
@@ -845,7 +846,7 @@ function updateTampilanStoring() {
 
 // 1. Fungsi Proses Absen Storing
 function prosesStoring(status) {
-  const nama = document.getElementById('nama').value;
+  const nama = document.getElementById('namaStaff').value;
   const lokasi = document.getElementById('lokasi').value;
 
   if (!nama || nama === "Pilih Nama...") {
@@ -864,14 +865,14 @@ function prosesStoring(status) {
     cancelButtonText: 'Batal'
   }).then((result) => {
     if (result.isConfirmed) {
-      showLoading(true);
+      tampilkanLoading();
       
       // Matikan semua tombol agar tidak terjadi double input
       kunciSemuaTombol(true);
 
       google.script.run
         .withSuccessHandler(function() {
-          showLoading(false);
+          sembunyikanLoading();
           // Kita buka kunci lagi setelah berhasil jika tidak reload
           kunciSemuaTombol(false); 
           Swal.fire("Berhasil", "Data Storing " + status + " tercatat!", "success");
@@ -880,7 +881,7 @@ function prosesStoring(status) {
           // location.reload(); 
         })
         .withFailureHandler(function(err) {
-          showLoading(false);
+          sembunyikanLoading();
           kunciSemuaTombol(false); // Buka kunci jika gagal agar bisa coba lagi
           Swal.fire("Error", "Gagal mengirim data: " + err.toString(), "error");
         })
