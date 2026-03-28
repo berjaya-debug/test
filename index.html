@@ -493,6 +493,16 @@
         <span>🏠 PULANG</span>
       </div>
     </div>
+    <div id="areaStoringMendadak" style="display: none; margin-top: 15px; padding: 15px; border: 2px dashed #ff416c; border-radius: 12px; background-color: #fff5f5; text-align: center;">
+      <p style="font-size: 13px; color: #ff416c; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+        🚨 Panggilan Storing Mendadak
+      </p>
+      <button type="button" onclick="klaimStoringMendadak()" 
+              style="width: 100%; padding: 15px; background: linear-gradient(45deg, #ff4b2b, #ff416c); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4); cursor: pointer; transition: 0.3s;">
+        KLAIM BONUS (+30rb)
+      </button>
+      <p style="font-size: 10px; color: #666; margin-top: 8px;">*Gunakan tombol ini hanya jika dipanggil setelah jam pulang.</p>
+    </div>
   </div>
 
   <!-- Storing toggle -->
@@ -562,6 +572,8 @@ window.onload = function () {
     handleFile(this);
   });
   ambilGPSBackground();
+  updateTampilanMendadak(); // Tambahkan baris ini
+  initApp();                // Fungsi bawaan Anda
 };
 
 /* ── JSONP ─────────────────────────────────────────────────── */
@@ -792,6 +804,55 @@ function sembunyikanLoading() {
   document.getElementById('loadingOverlay').classList.remove('show');
   btnKirim.disabled = false;
 }
+
+  function updateTampilanMendadak() {
+      const sekarang = new Date();
+      const jam = sekarang.getHours();
+      const areaMendadak = document.getElementById('areaStoringMendadak');
+      
+      // Munculkan jika jam 17.00 ke atas
+      if (jam >= 17) {
+        areaMendadak.style.display = 'block';
+      } else {
+        areaMendadak.style.display = 'none';
+      }
+    }
+    
+    // 2. Fungsi Kirim Data ke Google Sheets
+    function klaimStoringMendadak() {
+      const nama = document.getElementById('nama').value;
+      const lokasi = document.getElementById('lokasi').value;
+    
+      if (!nama || nama === "Pilih Nama...") {
+        Swal.fire("Peringatan", "Silakan pilih Nama Anda terlebih dahulu!", "warning");
+        return;
+      }
+    
+      Swal.fire({
+        title: 'Konfirmasi Storing',
+        text: "Anda akan mengklaim bonus Storing Mendadak sebesar Rp30.000. Lanjutkan?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ff416c',
+        confirmButtonText: 'Ya, Klaim!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          showLoading(true);
+          
+          // Mengirim status "BONUS" agar NBM (Uang Makan) tidak terhitung double
+          google.script.run
+            .withSuccessHandler(function(response) {
+              showLoading(false);
+              Swal.fire("Berhasil", "Bonus Storing Mendadak telah dicatat!", "success");
+            })
+            .withFailureHandler(function(err) {
+              showLoading(false);
+              Swal.fire("Gagal", "Terjadi kesalahan: " + err, "error");
+            })
+            .simpanAbsen(nama, "BONUS", "STORING MENDADAK", lokasi);
+        }
+      });
+    }
 </script>
 
   <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_63cbGmBGfHqUL8oq2noSGS6a5kYesobaZnRIPIBn9IOouA/viewform?usp=publish-editor" 
@@ -852,6 +913,9 @@ function sembunyikanLoading() {
       if (window.matchMedia('(display-mode: standalone)').matches) {
           installBanner.style.display = 'none';
       }
+
+        // 1. Fungsi untuk cek waktu (Panggil di window.onload)
+    
       </script>
   
 </body>
