@@ -493,18 +493,20 @@
         <span>🏠 PULANG</span>
       </div>
     </div>
-    <div id="areaStoringMendadak" style="display: none; margin-top: 15px; padding: 15px; border: 2px dashed #ff416c; border-radius: 12px; background-color: #fff5f5;">
-      <p style="font-size: 13px; color: #ff416c; margin-bottom: 10px; font-weight: bold; text-align: center;">🚨 STORING MENDADAK (PANGGILAN)</p>
-      
-      <button type="button" onclick="absenMendadak('HADIR')" 
-              style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 8px;">
-        START STORING
-      </button>
-    
-      <button type="button" onclick="absenMendadak('PULANG')" 
-              style="width: 100%; padding: 12px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: bold;">
-        SELESAI STORING
-      </button>
+    <div id="areaStoringMendadak" style="display: none; border-top: 2px dashed #ccc; margin-top: 20px; padding-top: 20px;">
+        <p style="text-align: center; font-weight: bold; color: #d32f2f; margin-bottom: 10px; font-size: 14px;">🚨 KHUSUS PANGGILAN STORING MENDADAK</p>
+        
+        <button type="button" id="btnStartStoring" class="btn-hadir" 
+                style="background: linear-gradient(135.2deg, #11998e 0.6%, #38ef7d 98%); margin-bottom: 15px;" 
+                onclick="prosesStoring('HADIR')">
+            MULAI STORING
+        </button>
+        
+        <button type="button" id="btnStopStoring" class="btn-pulang" 
+                style="background: linear-gradient(135.2deg, #cb2d3e 0.6%, #ef473a 98%);" 
+                onclick="prosesStoring('PULANG')">
+            SELESAI STORING
+        </button>
     </div>
     
     <script>
@@ -828,55 +830,68 @@ function sembunyikanLoading() {
   btnKirim.disabled = false;
 }
 
-  function updateTampilanMendadak() {
-      const sekarang = new Date();
-      const jam = sekarang.getHours();
-      const areaMendadak = document.getElementById('areaStoringMendadak');
+// 1. Fungsi Cek Waktu & Munculkan Tombol
+function updateTampilanStoring() {
+  const jam = new Date().getHours();
+  const area = document.getElementById('areaStoringMendadak');
+  
+  // Munculkan jika sudah jam 17.00 ke atas
+  if (jam >= 10) {
+    area.style.display = 'block';
+  } else {
+    area.style.display = 'none';
+  }
+}
+
+// 2. Fungsi Proses Absen Storing
+function prosesStoring(status) {
+  const nama = document.getElementById('nama').value;
+  const lokasi = document.getElementById('lokasi').value;
+
+  if (!nama || nama === "Pilih Nama...") {
+    Swal.fire("Peringatan", "Silakan pilih Nama Anda terlebih dahulu!", "warning");
+    return;
+  }
+
+  const teks = status === 'HADIR' ? "Mulai tugas Storing Mendadak?" : "Selesai tugas Storing Mendadak?";
+
+  Swal.fire({
+    title: 'Konfirmasi Storing',
+    text: teks,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Proses'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      showLoading(true);
       
-      // Munculkan jika jam 17.00 ke atas
-      if (jam >= 10) {
-        areaMendadak.style.display = 'block';
-      } else {
-        areaMendadak.style.display = 'none';
-      }
+      // Matikan tombol agar tidak double click
+      kunciSemuaTombol(true);
+
+      google.script.run
+        .withSuccessHandler(function() {
+          showLoading(false);
+          Swal.fire("Berhasil", "Data Storing " + status + " tercatat!", "success");
+          // Anda bisa menambahkan location.reload() jika ingin form reset otomatis
+        })
+        .withFailureHandler(function(err) {
+          showLoading(false);
+          kunciSemuaTombol(false);
+          Swal.fire("Error", err.toString(), "error");
+        })
+        .simpanAbsen(nama, status, "STORING MENDADAK", lokasi);
     }
-    
-    // 2. Fungsi Kirim Data ke Google Sheets
-    function klaimStoringMendadak() {
-      const nama = document.getElementById('nama').value;
-      const lokasi = document.getElementById('lokasi').value;
-    
-      if (!nama || nama === "Pilih Nama...") {
-        Swal.fire("Peringatan", "Silakan pilih Nama Anda terlebih dahulu!", "warning");
-        return;
-      }
-    
-      Swal.fire({
-        title: 'Konfirmasi Storing',
-        text: "Anda akan mengklaim bonus Storing Mendadak sebesar Rp30.000. Lanjutkan?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#ff416c',
-        confirmButtonText: 'Ya, Klaim!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          showLoading(true);
-          
-          // Mengirim status "BONUS" agar NBM (Uang Makan) tidak terhitung double
-          google.script.run
-            .withSuccessHandler(function(response) {
-              showLoading(false);
-              Swal.fire("Berhasil", "Bonus Storing Mendadak telah dicatat!", "success");
-            })
-            .withFailureHandler(function(err) {
-              showLoading(false);
-              Swal.fire("Gagal", "Terjadi kesalahan: " + err, "error");
-            })
-            .simpanAbsen(nama, "BONUS", "STORING MENDADAK", lokasi);
-        }
-      });
-    }
-</script>
+  });
+}
+
+// 3. Fungsi Pengunci (Agar tidak tabrakan)
+function kunciSemuaTombol(status) {
+  const ids = ['btn-hadir', 'btn-pulang', 'btnStartStoring', 'btnStopStoring'];
+  ids.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = status;
+  });
+}
 
   <a href="https://docs.google.com/forms/d/e/1FAIpQLSd_63cbGmBGfHqUL8oq2noSGS6a5kYesobaZnRIPIBn9IOouA/viewform?usp=publish-editor" 
      target="_blank" 
